@@ -20,14 +20,10 @@ var jumlahAktivitas int // Jumlah aktivitas yang saat ini tersimpan dalam array
 // Mengonversi string ke huruf kecil
 func toLower(s string) string {
 	var result []rune
-	// Iterasi melalui setiap karakter (rune) dalam string
 	for _, r := range s {
-		// Jika karakter adalah huruf kapital (A-Z)
 		if r >= 'A' && r <= 'Z' {
-			// Ubah menjadi huruf kecil dengan menambahkan selisih 'a' dan 'A'
 			result = append(result, r+'a'-'A')
 		} else {
-			// Jika bukan huruf kapital, biarkan apa adanya
 			result = append(result, r)
 		}
 	}
@@ -35,111 +31,93 @@ func toLower(s string) string {
 }
 
 // Mengecek apakah string s mengandung substring sub (case-insensitive)
-// Menggunakan implementasi sederhana pengganti strings.Contains
 func stringContains(s, sub string) bool {
 	sLower := toLower(s)
 	subLower := toLower(sub)
 
-	// Jika substring yang dicari kosong, anggap selalu terkandung
 	if len(subLower) == 0 {
 		return true
 	}
-	// Jika panjang string utama lebih pendek dari substring, tidak mungkin terkandung
 	if len(sLower) < len(subLower) {
 		return false
 	}
 
-	// Iterasi melalui string utama untuk mencari substring
 	for i := 0; i <= len(sLower)-len(subLower); i++ {
 		match := true
-		// Bandingkan karakter per karakter
 		for j := 0; j < len(subLower); j++ {
 			if sLower[i+j] != subLower[j] {
 				match = false
-				// Tidak menggunakan break, inner loop akan selesai
-				// dan 'match' akan tetap false jika ada ketidakcocokan
 			}
 		}
 		if match {
-			return true // Substring ditemukan
+			return true
 		}
 	}
-	return false // Substring tidak ditemukan
+	return false
 }
 
-// --- Fungsi untuk mendapatkan input dari pengguna ---
-// Catatan: fmt.Scan hanya membaca hingga spasi. Untuk deskripsi atau kategori multi-kata,
-// ini akan membaca hanya kata pertama.
-
-// Fungsi untuk mendapatkan input string dari pengguna
+// Fungsi untuk mendapatkan input string dari pengguna (menggunakan fmt.Scan)
 func getInputString(prompt string) string {
 	var input string
 	fmt.Print(prompt)
-	fmt.Scan(&input) // Membaca satu kata
+	fmt.Scan(&input)
 	return input
 }
 
-// Fungsi untuk mendapatkan input integer dari pengguna
+// Fungsi untuk mendapatkan input integer dari pengguna (menggunakan fmt.Scan)
 func getInputInt(prompt string) int {
 	var input int
 	fmt.Print(prompt)
-	for { // Loop tak terbatas hingga input valid
+	for {
 		_, err := fmt.Scan(&input)
 		if err == nil {
-			return input // Input valid, keluar dari loop
+			return input
 		}
 		fmt.Println("Input tidak valid. Masukkan angka.")
-		// Membersihkan buffer input jika ada karakter yang tidak sesuai
-		// Ini penting karena fmt.Scan tidak mengonsumsi newline setelah error
 		var dummy string
-		fmt.Scanln(&dummy) // Baca sisa baris untuk membersihkan buffer
+		fmt.Scanln(&dummy)
 	}
 }
 
-// Fungsi untuk mendapatkan input float64 dari pengguna
+// Fungsi untuk mendapatkan input float64 dari pengguna (menggunakan fmt.Scan)
 func getInputFloat(prompt string) float64 {
 	var input float64
 	fmt.Print(prompt)
-	for { // Loop tak terbatas hingga input valid
+	for {
 		_, err := fmt.Scan(&input)
 		if err == nil {
-			return input // Input valid, keluar dari loop
+			return input
 		}
 		fmt.Println("Input tidak valid. Masukkan angka desimal.")
-		// Membersihkan buffer input
 		var dummy string
-		fmt.Scanln(&dummy) // Baca sisa baris untuk membersihkan buffer
+		fmt.Scanln(&dummy)
 	}
 }
 
 // --- Pencarian: Cari ID Aktivitas (untuk internal) ---
-// Mengembalikan indeks aktivitas berdasarkan ID, atau -1 jika tidak ditemukan
 func findAktivitasIndexByID(id int) int {
 	for i := 0; i < jumlahAktivitas; i++ {
 		if daftarAktivitas[i].ID == id {
-			return i // ID ditemukan pada indeks ini
+			return i
 		}
 	}
-	return -1 // ID tidak ditemukan
+	return -1
 }
 
 // --- Menu: 1. Tambah Aktivitas ---
-// Mengambil parameter sesuai permintaan di main
 func tambahAktivitas(id int, kategori, deskripsi string, dampak float64, frekuensi int) {
 	if jumlahAktivitas >= MAX_AKTIVITAS {
 		fmt.Println("Maaf, kapasitas aktivitas sudah penuh (maksimal 100).")
-		return // Keluar dari fungsi
+		return
 	}
 
-	// Cek apakah ID sudah ada
 	for i := 0; i < jumlahAktivitas; i++ {
 		if daftarAktivitas[i].ID == id {
 			fmt.Println("Gagal menambahkan: ID sudah ada. Gunakan ID lain atau edit aktivitas yang sudah ada.")
-			return // Keluar dari fungsi
+			return
 		}
 	}
 
-	// Buat objek Aktivitas baru
 	aktivitasBaru := Aktivitas{
 		ID:           id,
 		Kategori:     kategori,
@@ -148,7 +126,6 @@ func tambahAktivitas(id int, kategori, deskripsi string, dampak float64, frekuen
 		Frekuensi:    frekuensi,
 	}
 
-	// Tambahkan aktivitas baru ke array dan perbarui jumlahAktivitas
 	daftarAktivitas[jumlahAktivitas] = aktivitasBaru
 	jumlahAktivitas++
 	fmt.Println("Aktivitas berhasil ditambahkan!")
@@ -157,74 +134,90 @@ func tambahAktivitas(id int, kategori, deskripsi string, dampak float64, frekuen
 // --- Menu: 2. Cari Aktivitas (Sequential & Binary Search) ---
 
 // Implementasi Sequential Search
-// Mencari aktivitas berdasarkan Kategori (case-insensitive)
-// Mengembalikan indeks pertama yang ditemukan, atau -1 jika tidak ditemukan
-func cariSequential(kategoriCari string) int {
+// Mengembalikan slice berisi INDEKS dari semua aktivitas yang cocok, atau slice kosong jika tidak ditemukan
+func cariSequential(kategoriCari string) []int {
+	var hasilIndeks []int
 	kategoriCariLower := toLower(kategoriCari)
 	for i := 0; i < jumlahAktivitas; i++ {
 		if toLower(daftarAktivitas[i].Kategori) == kategoriCariLower {
-			return i // Mengembalikan indeks pertama yang cocok
+			hasilIndeks = append(hasilIndeks, i)
 		}
 	}
-	return -1 // Tidak ditemukan
+	return hasilIndeks
 }
 
 // Fungsi bantu untuk mengurutkan daftarAktivitas berdasarkan Kategori untuk Binary Search
-// Menggunakan Selection Sort untuk mengurutkan
 func selectionSortKategori() {
 	for i := 0; i < jumlahAktivitas-1; i++ {
 		minIndex := i
 		for j := i + 1; j < jumlahAktivitas; j++ {
-			// Membandingkan string kategori secara alfabetis (case-insensitive)
 			if toLower(daftarAktivitas[j].Kategori) < toLower(daftarAktivitas[minIndex].Kategori) {
 				minIndex = j
 			}
 		}
-		// Tukar elemen jika ditemukan yang lebih kecil
 		daftarAktivitas[i], daftarAktivitas[minIndex] = daftarAktivitas[minIndex], daftarAktivitas[i]
 	}
 }
 
 // Implementasi Binary Search (membutuhkan data terurut berdasarkan Kategori)
-// Mengembalikan indeks dalam array, atau -1 jika tidak ditemukan
-func cariBinary(kategoriCari string) int {
+// Mengembalikan slice berisi INDEKS dari semua aktivitas yang cocok, atau slice kosong jika tidak ditemukan
+func cariBinary(kategoriCari string) []int {
+	var hasilIndeks []int
 	kategoriCariLower := toLower(kategoriCari)
 	low := 0
 	high := jumlahAktivitas - 1
 
-	for low <= high { // Loop selama batas bawah tidak melebihi batas atas
-		mid := low + (high-low)/2 // Hitung indeks tengah
+	// Phase 1: Temukan indeks pertama dari kategori yang dicari
+	firstOccurenceIndex := -1
+	for low <= high {
+		mid := low + (high-low)/2
 		currentKategoriLower := toLower(daftarAktivitas[mid].Kategori)
 
 		if currentKategoriLower == kategoriCariLower {
-			return mid // Kategori ditemukan pada indeks tengah
+			firstOccurenceIndex = mid // Potensi indeks pertama
+			high = mid - 1             // Coba cari lagi di sisi kiri untuk yang paling awal
 		} else if currentKategoriLower < kategoriCariLower {
-			low = mid + 1 // Kategori yang dicari ada di paruh kanan
-		} else { // currentKategoriLower > kategoriCariLower
-			high = mid - 1 // Kategori yang dicari ada di paruh kiri
+			low = mid + 1
+		} else {
+			high = mid - 1
 		}
 	}
-	return -1 // Kategori tidak ditemukan
+
+	if firstOccurenceIndex == -1 {
+		return hasilIndeks // Tidak ditemukan
+	}
+
+	// Phase 2: Tambahkan semua kemunculan yang ditemukan ke dalam hasilIndeks
+	// Dimulai dari firstOccurenceIndex
+	// Perubahan ada di sini: tambahkan firstOccurenceIndex secara eksplisit, lalu iterasi dari berikutnya
+	hasilIndeks = append(hasilIndeks, firstOccurenceIndex) // Tambahkan indeks pertama yang ditemukan
+
+	// Iterasi ke kanan dari indeks setelah firstOccurenceIndex
+	for i := firstOccurenceIndex + 1; i < jumlahAktivitas; i++ {
+		if toLower(daftarAktivitas[i].Kategori) == kategoriCariLower {
+			hasilIndeks = append(hasilIndeks, i)
+		} else {
+			// Karena array sudah terurut, jika kategori tidak cocok lagi,
+			// kita tahu tidak ada lagi kecocokan ke kanan.
+			// Tanpa break, loop akan terus berjalan hingga akhir, tapi tidak akan menambahkan lagi.
+		}
+	}
+	return hasilIndeks
 }
 
 // --- Menu: 3. Edit Aktivitas & Hapus Aktivitas ---
-// Mengambil parameter sesuai permintaan di main, termasuk isDelete
 func editAktivitas(id int, kategori, deskripsi string, dampak float64, frekuensi int, isDelete bool) {
-	foundIndex := findAktivitasIndexByID(id) // Cari indeks aktivitas berdasarkan ID
+	foundIndex := findAktivitasIndexByID(id)
 
-	if foundIndex != -1 { // Jika aktivitas ditemukan
+	if foundIndex != -1 {
 		if isDelete {
-			// Logika Hapus Aktivitas
-			// Geser semua elemen setelah yang dihapus ke depan untuk mengisi "lubang"
 			for i := foundIndex; i < jumlahAktivitas-1; i++ {
 				daftarAktivitas[i] = daftarAktivitas[i+1]
 			}
-			// Kosongkan elemen terakhir (opsional, tapi baik untuk kebersihan)
 			daftarAktivitas[jumlahAktivitas-1] = Aktivitas{}
-			jumlahAktivitas-- // Kurangi jumlah aktivitas yang valid
+			jumlahAktivitas--
 			fmt.Println("Aktivitas berhasil dihapus!")
 		} else {
-			// Logika Edit Aktivitas
 			daftarAktivitas[foundIndex].Kategori = kategori
 			daftarAktivitas[foundIndex].Deskripsi = deskripsi
 			daftarAktivitas[foundIndex].DampakKarbon = dampak
@@ -237,48 +230,40 @@ func editAktivitas(id int, kategori, deskripsi string, dampak float64, frekuensi
 }
 
 // --- Menu: 4. Urutkan (Selection Sort & Insertion Sort) ---
-
-// Implementasi Selection Sort (berdasarkan Dampak Karbon)
-// Urutan ditentukan oleh parameter 'ascending'
 func selectionSortDampak(ascending bool) {
 	for i := 0; i < jumlahAktivitas-1; i++ {
-		extremeIndex := i // Indeks elemen terkecil (jika ascending) atau terbesar (jika descending)
+		extremeIndex := i
 		for j := i + 1; j < jumlahAktivitas; j++ {
-			if ascending { // Urutkan dari dampak terkecil ke terbesar
+			if ascending {
 				if daftarAktivitas[j].DampakKarbon < daftarAktivitas[extremeIndex].DampakKarbon {
 					extremeIndex = j
 				}
-			} else { // Urutkan dari dampak terbesar ke terkecil
+			} else {
 				if daftarAktivitas[j].DampakKarbon > daftarAktivitas[extremeIndex].DampakKarbon {
 					extremeIndex = j
 				}
 			}
 		}
-		// Tukar elemen saat ini dengan elemen ekstrem yang ditemukan
 		daftarAktivitas[i], daftarAktivitas[extremeIndex] = daftarAktivitas[extremeIndex], daftarAktivitas[i]
 	}
 }
 
-// Implementasi Insertion Sort (berdasarkan Frekuensi)
-// Urutan ditentukan oleh parameter 'ascending'
 func insertionSortFrekuensi(ascending bool) {
 	for i := 1; i < jumlahAktivitas; i++ {
-		key := daftarAktivitas[i] // Elemen yang akan disisipkan
+		key := daftarAktivitas[i]
 		j := i - 1
-		// Pindahkan elemen daftarAktivitas[0..i-1] yang lebih besar/kecil dari key
-		// ke satu posisi di depan posisi mereka saat ini
-		if ascending { // Urutkan dari frekuensi terkecil ke terbesar
+		if ascending {
 			for j >= 0 && daftarAktivitas[j].Frekuensi > key.Frekuensi {
 				daftarAktivitas[j+1] = daftarAktivitas[j]
 				j = j - 1
 			}
-		} else { // Urutkan dari frekuensi terbesar ke terkecil
+		} else {
 			for j >= 0 && daftarAktivitas[j].Frekuensi < key.Frekuensi {
 				daftarAktivitas[j+1] = daftarAktivitas[j]
 				j = j - 1
 			}
 		}
-		daftarAktivitas[j+1] = key // Sisipkan key di posisi yang benar
+		daftarAktivitas[j+1] = key
 	}
 }
 
@@ -289,15 +274,29 @@ func tampilkanDaftar() {
 		fmt.Println("Belum ada aktivitas yang ditambahkan.")
 		return
 	}
-	// Header tabel
 	fmt.Printf("%-5s | %-15s | %-20s | %-10s | %-10s\n", "ID", "Kategori", "Deskripsi", "Dampak (kg)", "Frekuensi")
 	fmt.Println("----------------------------------------------------------------------")
-	// Cetak setiap aktivitas yang valid
 	for i := 0; i < jumlahAktivitas; i++ {
 		a := daftarAktivitas[i]
 		fmt.Printf("%-5d | %-15s | %-20s | %-10.2f | %-10d\n", a.ID, a.Kategori, a.Deskripsi, a.DampakKarbon, a.Frekuensi)
 	}
 }
+
+// --- Fungsi untuk menampilkan hasil pencarian ---
+func tampilkanHasilPencarian(hasilIndeks []int) {
+    if len(hasilIndeks) == 0 {
+        fmt.Println("Aktivitas tidak ditemukan!")
+        return
+    }
+    fmt.Println("Aktivitas ditemukan:")
+    fmt.Printf("%-5s | %-15s | %-20s | %-10s | %-10s\n", "ID", "Kategori", "Deskripsi", "Dampak (kg)", "Frekuensi")
+    fmt.Println("----------------------------------------------------------------------")
+    for _, idx := range hasilIndeks {
+        a := daftarAktivitas[idx]
+        fmt.Printf("%-5d | %-15s | %-20s | %-10.2f | %-10d\n", a.ID, a.Kategori, a.Deskripsi, a.DampakKarbon, a.Frekuensi)
+    }
+}
+
 
 // --- Menu: 6. Laporan Bulanan & Rekomendasi ---
 func laporanBulanan() {
@@ -309,17 +308,13 @@ func laporanBulanan() {
 	fmt.Println("\n--- Laporan Bulanan Jejak Karbon ---")
 
 	totalJejakKarbon := 0.0
-	// Inisialisasi dengan nilai yang memastikan update pertama untuk pencarian nilai ekstrim
 	aktivitasTerbanyakDampak := Aktivitas{DampakKarbon: -1.0}
 	aktivitasTerdikitDampak := Aktivitas{DampakKarbon: 999999999.0}
 
-	// Hitung total jejak karbon dan cari aktivitas dengan dampak max/min
 	for i := 0; i < jumlahAktivitas; i++ {
 		a := daftarAktivitas[i]
-		// Total jejak karbon dihitung dari dampak per aktivitas dikalikan frekuensi
 		totalJejakKarbon += a.DampakKarbon * float64(a.Frekuensi)
 
-		// Pencarian Nilai Ekstrim (Max/Min)
 		if a.DampakKarbon > aktivitasTerbanyakDampak.DampakKarbon {
 			aktivitasTerbanyakDampak = a
 		}
@@ -330,7 +325,6 @@ func laporanBulanan() {
 
 	fmt.Printf("Total Jejak Karbon Bulan Ini: %.2f kg CO2e\n", totalJejakKarbon)
 
-	// Tampilkan aktivitas dengan dampak ekstrim jika ada data valid
 	if aktivitasTerbanyakDampak.DampakKarbon != -1.0 {
 		fmt.Printf("Aktivitas dengan Dampak Karbon Terbesar: '%s' (%.2f kg CO2e)\n", aktivitasTerbanyakDampak.Deskripsi, aktivitasTerbanyakDampak.DampakKarbon)
 	}
@@ -338,10 +332,7 @@ func laporanBulanan() {
 		fmt.Printf("Aktivitas dengan Dampak Karbon Terkecil: '%s' (%.2f kg CO2e)\n", aktivitasTerdikitDampak.Deskripsi, aktivitasTerdikitDampak.DampakKarbon)
 	}
 
-	// Skor keberlanjutan sederhana (contoh perhitungan)
-	// Asumsi: Semakin rendah jejak karbon, semakin tinggi skor.
-	// Jika totalJejakKarbon 0, skor 100. Jika 100 kg CO2e, skor 0.
-	skor := 100.0 - (totalJejakKarbon / 100.0 * 100.0 / 100.0) // Disederhanakan menjadi 100 - totalJejakKarbon
+	skor := 100.0 - (totalJejakKarbon / 100.0 * 100.0 / 100.0)
 	if skor < 0 {
 		skor = 0
 	} else if skor > 100 {
@@ -349,7 +340,6 @@ func laporanBulanan() {
 	}
 	fmt.Printf("Skor Keberlanjutan Anda: %.2f/100\n", skor)
 
-	// Rekomendasi berdasarkan total jejak karbon
 	fmt.Println("\nRekomendasi untuk Mengurangi Jejak Karbon:")
 	if totalJejakKarbon > 500 {
 		fmt.Println("- Pertimbangkan untuk mengurangi perjalanan menggunakan kendaraan pribadi.")
@@ -367,20 +357,21 @@ func laporanBulanan() {
 
 // --- Main Program (Menu Interaktif) ---
 func main() {
-	// Variabel lokal untuk input menu
 	var pilihan, subPilihan, id, frekuensi int
 	var kategori, deskripsi string
 	var dampak float64
 	var ascending bool
 
-	// Contoh data awal untuk demonstrasi
+	// Contoh data awal (ditambahkan beberapa aktivitas dengan kategori yang sama untuk pengujian)
 	daftarAktivitas[0] = Aktivitas{ID: 1, Deskripsi: "Motor", Kategori: "Transportasi", DampakKarbon: 2.3, Frekuensi: 20}
-	daftarAktivitas[1] = Aktivitas{ID: 2, Deskripsi: "Ayam", Kategori: "Makanan", DampakKarbon: 1.5, Frekuensi: 30}
-	daftarAktivitas[2] = Aktivitas{ID: 3, Deskripsi: "Lampu", Kategori: "Energi", DampakKarbon: -0.2, Frekuensi: 60}
-	daftarAktivitas[3] = Aktivitas{ID: 4, Deskripsi: "Anorganik", Kategori: "Sampah", DampakKarbon: 0.8, Frekuensi: 15}
-	jumlahAktivitas = 4 // Set jumlah aktivitas sesuai data awal yang dimasukkan
+	daftarAktivitas[1] = Aktivitas{ID: 2, Deskripsi: "Kereta", Kategori: "Transportasi", DampakKarbon: 1.0, Frekuensi: 10}
+	daftarAktivitas[2] = Aktivitas{ID: 3, Deskripsi: "Bus", Kategori: "Transportasi", DampakKarbon: 0.5, Frekuensi: 15} // Tambahan kategori sama
+	daftarAktivitas[3] = Aktivitas{ID: 4, Deskripsi: "Ayam", Kategori: "Makanan", DampakKarbon: 1.5, Frekuensi: 30}
+	daftarAktivitas[4] = Aktivitas{ID: 5, Deskripsi: "Sayur", Kategori: "Makanan", DampakKarbon: 0.2, Frekuensi: 15}
+	daftarAktivitas[5] = Aktivitas{ID: 6, Deskripsi: "Daging", Kategori: "Makanan", DampakKarbon: 3.0, Frekuensi: 5} // Tambahan kategori sama
+	daftarAktivitas[6] = Aktivitas{ID: 7, Deskripsi: "Lampu", Kategori: "Energi", DampakKarbon: -0.2, Frekuensi: 60}
+	jumlahAktivitas = 7 // Sesuaikan jumlah aktivitas
 
-	// Loop utama program untuk menampilkan menu
 	for {
 		fmt.Println("\n=== Aplikasi Pelacak Gaya Hidup Ramah Lingkungan ===")
 		fmt.Println("1. Tambah Aktivitas")
@@ -389,17 +380,15 @@ func main() {
 		fmt.Println("4. Urutkan")
 		fmt.Println("5. Tampilkan Daftar Aktivitas")
 		fmt.Println("6. Laporan Bulanan")
-		fmt.Println("0. Keluar") // Opsi untuk keluar dari program
+		fmt.Println("0. Keluar")
 		fmt.Print("Pilih menu (berupa angka, contoh: 1): ")
-		fmt.Scan(&pilihan) // Membaca pilihan menu
+		fmt.Scan(&pilihan)
 
-		// Logika untuk keluar dari program
 		if pilihan == 0 {
 			fmt.Println("Terima kasih telah menggunakan Aplikasi Pelacak Gaya Hidup Ramah Lingkungan!")
-			return // Keluar dari fungsi main, mengakhiri program
+			return
 		}
 
-		// Logika untuk setiap pilihan menu menggunakan if-else if-else
 		if pilihan == 1 {
 			fmt.Print("Masukkan ID (berupa angka, contoh: 1): ")
 			fmt.Scan(&id)
@@ -421,26 +410,12 @@ func main() {
 			fmt.Print("Pilih metode (berupa angka, contoh: 1): ")
 			fmt.Scan(&subPilihan)
 			if subPilihan == 1 {
-				idx := cariSequential(kategori)
-				if idx != -1 {
-					fmt.Printf("Ditemukan: ID: %d, Deskripsi: %s, Kategori: %s, Dampak: %.2f kgCO2e, Frekuensi: %d\n",
-						daftarAktivitas[idx].ID, daftarAktivitas[idx].Deskripsi, daftarAktivitas[idx].Kategori,
-						daftarAktivitas[idx].DampakKarbon, daftarAktivitas[idx].Frekuensi)
-				} else {
-					fmt.Println("Aktivitas tidak ditemukan!")
-				}
+				hasilIndeks := cariSequential(kategori)
+				tampilkanHasilPencarian(hasilIndeks)
 			} else if subPilihan == 2 {
-				// Penting: Binary Search memerlukan data terurut.
-				// Urutkan dulu berdasarkan kategori sebelum mencari.
-				selectionSortKategori() // Mengurutkan array global
-				idx := cariBinary(kategori)
-				if idx != -1 {
-					fmt.Printf("Ditemukan: ID: %d, Deskripsi: %s, Kategori: %s, Dampak: %.2f kgCO2e, Frekuensi: %d\n",
-						daftarAktivitas[idx].ID, daftarAktivitas[idx].Deskripsi, daftarAktivitas[idx].Kategori,
-						daftarAktivitas[idx].DampakKarbon, daftarAktivitas[idx].Frekuensi)
-				} else {
-					fmt.Println("Aktivitas tidak ditemukan!")
-				}
+				selectionSortKategori() // Urutkan dulu sebelum binary search
+				hasilIndeks := cariBinary(kategori)
+				tampilkanHasilPencarian(hasilIndeks)
 			} else {
 				fmt.Println("Pilihan tidak valid!")
 			}
@@ -461,11 +436,9 @@ func main() {
 				fmt.Scan(&dampak)
 				fmt.Print("Masukkan Frekuensi baru (contoh: 15): ")
 				fmt.Scan(&frekuensi)
-				editAktivitas(id, kategori, deskripsi, dampak, frekuensi, false) // false berarti edit
+				editAktivitas(id, kategori, deskripsi, dampak, frekuensi, false)
 			} else if subPilihan == 2 {
-				// Untuk hapus, nilai kategori, deskripsi, dampak, frekuensi tidak relevan,
-				// jadi bisa dilewatkan nilai default atau kosong.
-				editAktivitas(id, "", "", 0, 0, true) // true berarti hapus
+				editAktivitas(id, "", "", 0, 0, true)
 			} else {
 				fmt.Println("Pilihan tidak valid!")
 			}
@@ -476,7 +449,7 @@ func main() {
 			fmt.Print("Pilih kriteria (berupa angka, contoh: 1): ")
 			fmt.Scan(&subPilihan)
 			fmt.Print("Urutkan ascending? (true/false, contoh: true): ")
-			fmt.Scan(&ascending) // Membaca boolean true/false
+			fmt.Scan(&ascending)
 			if subPilihan == 1 {
 				selectionSortDampak(ascending)
 				tampilkanDaftar()
