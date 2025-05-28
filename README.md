@@ -7,7 +7,7 @@ Aplikasi Pelacak Gaya Hidup Ramah Lingkungan adalah program berbasis konsol sede
 Aplikasi ini mengimplementasikan berbagai konsep dasar algoritma dan pemrograman yang diajarkan, meliputi:
 
 ##### - Tipe Bentukan (Struct): Menggunakan struktur data Aktivitas untuk menyimpan detail setiap kegiatan, seperti ID, kategori, deskripsi, dampak karbon, dan frekuensi.
-##### - Array Statis: Data aktivitas disimpan dalam array berukuran tetap ([100]Aktivitas), dengan pengelolaan jumlah elemen aktif secara manual.
+##### - Array: Data aktivitas disimpan dalam array berukuran tetap ([100]Aktivitas), dengan pengelolaan jumlah elemen aktif secara manual.
 ##### - Subprogram (Fungsi/Prosedur): Setiap fungsionalitas (tambah, cari, edit, urutkan, laporan) diimplementasikan sebagai fungsi terpisah untuk modularitas kode.
 ##### - Pencarian Nilai Ekstrem: Sistem secara otomatis mengidentifikasi aktivitas dengan dampak karbon terbesar dan terkecil dalam laporan bulanan.
 ##### - Sequential Search: Digunakan untuk mencari aktivitas berdasarkan kategori secara berurutan.
