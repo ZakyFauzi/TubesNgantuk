@@ -4,17 +4,16 @@ import "fmt"
 
 // --- Tipe Bentukan (Struct) ---
 type Aktivitas struct {
-	ID           int
-	Kategori     string  // Contoh: Transportasi, Makanan, Energi, Sampah
-	Deskripsi    string  // Lebih umum dari Nama, bisa "Naik motor 10km"
-	DampakKarbon float64 // Dalam kg CO2e
-	Frekuensi    int     // Berapa kali dilakukan dalam periode tertentu (misal: per bulan)
+	ID int
+	Kategori string
+	Deskripsi string
+	DampakKarbon float64
+	Frekuensi int
 }
 
-// --- Variabel Global (Array Statis) ---
-const MAX_AKTIVITAS = 100 // Ukuran maksimum array
+const MAX_AKTIVITAS = 100
 var daftarAktivitas [MAX_AKTIVITAS]Aktivitas
-var jumlahAktivitas int // Jumlah aktivitas yang saat ini tersimpan dalam array
+var jumlahAktivitas int
 
 // --- Fungsi Bantu (untuk String, karena tanpa "strings" package) ---
 // Mengonversi string ke huruf kecil
@@ -28,70 +27,6 @@ func toLower(s string) string {
 		}
 	}
 	return string(result)
-}
-
-// Mengecek apakah string s mengandung substring sub (case-insensitive)
-func stringContains(s, sub string) bool {
-	sLower := toLower(s)
-	subLower := toLower(sub)
-
-	if len(subLower) == 0 {
-		return true
-	}
-	if len(sLower) < len(subLower) {
-		return false
-	}
-
-	for i := 0; i <= len(sLower)-len(subLower); i++ {
-		match := true
-		for j := 0; j < len(subLower); j++ {
-			if sLower[i+j] != subLower[j] {
-				match = false
-			}
-		}
-		if match {
-			return true
-		}
-	}
-	return false
-}
-
-// Fungsi untuk mendapatkan input string dari pengguna (menggunakan fmt.Scan)
-func getInputString(prompt string) string {
-	var input string
-	fmt.Print(prompt)
-	fmt.Scan(&input)
-	return input
-}
-
-// Fungsi untuk mendapatkan input integer dari pengguna (menggunakan fmt.Scan)
-func getInputInt(prompt string) int {
-	var input int
-	fmt.Print(prompt)
-	for {
-		_, err := fmt.Scan(&input)
-		if err == nil {
-			return input
-		}
-		fmt.Println("Input tidak valid. Masukkan angka.")
-		var dummy string
-		fmt.Scanln(&dummy)
-	}
-}
-
-// Fungsi untuk mendapatkan input float64 dari pengguna (menggunakan fmt.Scan)
-func getInputFloat(prompt string) float64 {
-	var input float64
-	fmt.Print(prompt)
-	for {
-		_, err := fmt.Scan(&input)
-		if err == nil {
-			return input
-		}
-		fmt.Println("Input tidak valid. Masukkan angka desimal.")
-		var dummy string
-		fmt.Scanln(&dummy)
-	}
 }
 
 // --- Pencarian: Cari ID Aktivitas (untuk internal) ---
@@ -332,7 +267,7 @@ func laporanBulanan() {
 		fmt.Printf("Aktivitas dengan Dampak Karbon Terkecil: '%s' (%.2f kg CO2e)\n", aktivitasTerdikitDampak.Deskripsi, aktivitasTerdikitDampak.DampakKarbon)
 	}
 
-	skor := 100.0 - (totalJejakKarbon / 100.0 * 100.0 / 100.0)
+	skor := 100.0 - (totalJejakKarbon / 100)
 	if skor < 0 {
 		skor = 0
 	} else if skor > 100 {
@@ -370,7 +305,7 @@ func main() {
 	daftarAktivitas[4] = Aktivitas{ID: 5, Deskripsi: "Sayur", Kategori: "Makanan", DampakKarbon: 0.2, Frekuensi: 15}
 	daftarAktivitas[5] = Aktivitas{ID: 6, Deskripsi: "Daging", Kategori: "Makanan", DampakKarbon: 3.0, Frekuensi: 5} // Tambahan kategori sama
 	daftarAktivitas[6] = Aktivitas{ID: 7, Deskripsi: "Lampu", Kategori: "Energi", DampakKarbon: -0.2, Frekuensi: 60}
-	jumlahAktivitas = 7 // Sesuaikan jumlah aktivitas
+	jumlahAktivitas = 7
 
 	for {
 		fmt.Println("\n=== Aplikasi Pelacak Gaya Hidup Ramah Lingkungan ===")
